@@ -18,11 +18,16 @@ function PostsPage({ message, filter = "" }) {
     /* used to determine what url the user is on */
     const { pathname } = useLocation();
 
+    const [query, setQuery] = useState("");
+
     /* fetch data from API */
     useEffect(() => {
         const fetchPosts = async () => {
             try {
-                const { data } = await axiosReq.get(`/posts/?${filter}`);
+                /* get filtered posts and searched queries */
+                const { data } = await axiosReq.get(
+                    `/posts/?${filter}search=${query}`
+                );
                 setPosts(data);
                 setHasLoaded(true);
             } catch (err) {
@@ -32,14 +37,37 @@ function PostsPage({ message, filter = "" }) {
 
         /* setHasLoaded to false so that the loading spinner displays */
         setHasLoaded(false);
-        /* call fetchPosts when filter or pathname changes */
-        fetchPosts();
-    }, [filter, pathname]);
+        /* use timer of 1s to delay calling the fetch posts function for better UI */
+        const timer = setTimeout(() => {
+            /* call fetchPosts when filter, pathname or query changes */
+            fetchPosts();
+        }, 1000);
+        /* clear timer within cleanup function */
+        return () => {
+            clearTimeout(timer);
+        };
+    }, [filter, query, pathname]);
 
     return (
         <Row className="h-100">
             <Col className="py-2 p-0 p-lg-2" lg={8}>
                 <p>Popular profiles mobile</p>
+                {/* search bar */}
+                <i className={`fas fa-search ${styles.SearchIcon}`} />
+                <Form
+                    className={styles.SearchBar}
+                    /* stop default page refresh if user hits enter */
+                    onSubmit={(event) => event.preventDefault()}
+                >
+                    <Form.Control
+                        type="text"
+                        className="mr-sm-2"
+                        placeholder="Search posts"
+                        value={query}
+                        /* update query when event target value changes */
+                        onChange={(event) => setQuery(event.target.value)}
+                    />
+                </Form>
                 {/* check if data has been loaded, and show loading spinner if not */}
                 {hasLoaded ? (
                     /* show posts or display a message */
