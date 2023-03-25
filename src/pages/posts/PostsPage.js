@@ -10,6 +10,8 @@ import { axiosReq } from "../../api/axiosDefaults";
 import Post from "./Post";
 import NoResults from "../../assets/no-results.png";
 import Asset from "../../components/Asset";
+import InfiniteScroll from "react-infinite-scroll-component";
+import { fetchMoreData } from "../../utils/utils";
 
 /* add message and filter props, filter as an empty string initially */
 function PostsPage({ message, filter = "" }) {
@@ -74,15 +76,29 @@ function PostsPage({ message, filter = "" }) {
                     <>
                         {/* check if there are any posts */}
                         {posts.results.length ? (
-                            /* map over posts and return Post component for each */
-                            posts.results.map((post) => (
-                                /* give it a key, spread the post object and include setPosts so that users can like and unlike */
-                                <Post
-                                    key={post.id}
-                                    {...post}
-                                    setPosts={setPosts}
-                                />
-                            ))
+                            /* infinite scroll component */
+                            <InfiniteScroll
+                                /* children prop determines the data to display */
+                                children={
+                                    /* map over posts and return Post component for each */
+                                    posts.results.map((post) => (
+                                        /* give it a key, spread the post object and include setPosts so that users can like and unlike */
+                                        <Post
+                                            key={post.id}
+                                            {...post}
+                                            setPosts={setPosts}
+                                        />
+                                    ))
+                                }
+                                /* dataLength determines how much data there is */
+                                dataLength={posts.results.length}
+                                /* loader icon */
+                                loader={<Asset spinner />}
+                                /* hasMore determines whether there is more to load on reaching end of page */
+                                hasMore={!!posts.next}
+                                /* next prop runs if hasMore equals true */
+                                next={() => fetchMoreData(posts, setPosts)}
+                            />
                         ) : (
                             <Container className={appStyles.Content}>
                                 <Asset src={NoResults} message={message} />
