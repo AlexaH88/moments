@@ -1,6 +1,7 @@
 import React from "react";
 import { Card, Media, OverlayTrigger, Tooltip } from "react-bootstrap";
 import { Link } from "react-router-dom";
+import { axiosRes } from "../../api/axiosDefaults";
 import Avatar from "../../components/Avatar";
 import { useSetCurrentUser } from "../../contexts/CurrentUserContext";
 import styles from "../../styles/Post.module.css";
@@ -20,11 +21,56 @@ const Post = (props) => {
         image,
         updated_at,
         postPage,
+        setPosts,
     } = props;
 
     const currentUser = useSetCurrentUser();
     /* check if owner of post is current logged in user */
     const is_owner = currentUser?.username === owner;
+
+    const handleLike = async () => {
+        try {
+            /* fetch post by id */
+            const { data } = await axiosRes.post("/likes/", { post: id });
+            /* update the post's data */
+            setPosts((prevPosts) => ({
+                ...prevPosts,
+                results: prevPosts.results.map((post) => {
+                    /* check if post id matches the post that was liked */
+                    return post.id === id
+                        ? {
+                            ...post,
+                            likes_count: post.likes_count + 1,
+                            like_id: data.id,
+                        }
+                        : /* if the id doesn't match, just return the post */
+                        post;
+                }),
+            }));
+        } catch (err) {
+            console.log(err);
+        }
+    };
+
+    const handleUnlike = async () => {
+        try {
+            await axiosRes.delete(`/likes/${like_id}`);
+            setPosts((prevPosts) => ({
+                ...prevPosts,
+                results: prevPosts.results.map((post) => {
+                    return post.id === id
+                        ? {
+                            ...post,
+                            likes_count: post.likes_count - 1,
+                            like_id: null,
+                        }
+                        : post;
+                }),
+            }));
+        } catch (err) {
+            console.log(err);
+        }
+    };
 
     return (
         <Card className={styles.Post}>
@@ -63,12 +109,12 @@ const Post = (props) => {
                         </OverlayTrigger>
                     ) : /* check if like_id already exists, so user can't like a post more than once */
                     like_id ? (
-                        <span onClick={() => {}}>
+                        <span onClick={handleUnlike}>
                             <i className={`fas fa-heart ${styles.Heart}`} />
                         </span>
                     ) : /* check if user is logged in, and allow them to like the post */
                     currentUser ? (
-                        <span onClick={() => {}}>
+                        <span onClick={handleLike}>
                             <i
                                 className={`fas fa-heart ${styles.HeartOutline}`}
                             />
@@ -84,7 +130,7 @@ const Post = (props) => {
                     )}
                     {likes_count}
                     <Link to={`/posts/${id}`}>
-                        <i className="far fa-comments"/>
+                        <i className="far fa-comments" />
                     </Link>
                     {comments_count}
                 </div>
