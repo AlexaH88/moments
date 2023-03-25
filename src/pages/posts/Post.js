@@ -3,7 +3,7 @@ import { Card, Media, OverlayTrigger, Tooltip } from "react-bootstrap";
 import { Link } from "react-router-dom";
 import { axiosRes } from "../../api/axiosDefaults";
 import Avatar from "../../components/Avatar";
-import { useSetCurrentUser } from "../../contexts/CurrentUserContext";
+import { useCurrentUser } from "../../contexts/CurrentUserContext";
 import styles from "../../styles/Post.module.css";
 
 const Post = (props) => {
@@ -24,7 +24,7 @@ const Post = (props) => {
         setPosts,
     } = props;
 
-    const currentUser = useSetCurrentUser();
+    const currentUser = useCurrentUser();
     /* check if owner of post is current logged in user */
     const is_owner = currentUser?.username === owner;
 
