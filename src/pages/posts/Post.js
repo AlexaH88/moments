@@ -1,8 +1,10 @@
 import React from "react";
 import { Card, Media, OverlayTrigger, Tooltip } from "react-bootstrap";
 import { Link } from "react-router-dom";
+import { useHistory } from "react-router-dom/cjs/react-router-dom";
 import { axiosRes } from "../../api/axiosDefaults";
 import Avatar from "../../components/Avatar";
+import { MoreDropdown } from "../../components/MoreDropdown";
 import { useCurrentUser } from "../../contexts/CurrentUserContext";
 import styles from "../../styles/Post.module.css";
 
@@ -27,6 +29,20 @@ const Post = (props) => {
     const currentUser = useCurrentUser();
     /* check if owner of post is current logged in user */
     const is_owner = currentUser?.username === owner;
+    const history = useHistory();
+
+    const handleEdit = () => {
+        history.push(`/posts/${id}/edit`);
+    };
+
+    const handleDelete = async () => {
+        try {
+            await axiosRes.delete(`/posts/${id}`);
+            history.goBack();
+        } catch (err) {
+            console.log(err);
+        }
+    };
 
     const handleLike = async () => {
         try {
@@ -39,12 +55,12 @@ const Post = (props) => {
                     /* check if post id matches the post that was liked */
                     return post.id === id
                         ? {
-                            ...post,
-                            likes_count: post.likes_count + 1,
-                            like_id: data.id,
-                        }
+                              ...post,
+                              likes_count: post.likes_count + 1,
+                              like_id: data.id,
+                          }
                         : /* if the id doesn't match, just return the post */
-                        post;
+                          post;
                 }),
             }));
         } catch (err) {
@@ -60,10 +76,10 @@ const Post = (props) => {
                 results: prevPosts.results.map((post) => {
                     return post.id === id
                         ? {
-                            ...post,
-                            likes_count: post.likes_count - 1,
-                            like_id: null,
-                        }
+                              ...post,
+                              likes_count: post.likes_count - 1,
+                              like_id: null,
+                          }
                         : post;
                 }),
             }));
@@ -83,7 +99,12 @@ const Post = (props) => {
                     <div className="d-flex align-items-center">
                         <span>{updated_at}</span>
                         {/* if current user is owner and if a post exists, allow for edit and delete */}
-                        {is_owner && postPage && "..."}
+                        {is_owner && postPage && (
+                            <MoreDropdown
+                                handleEdit={handleEdit}
+                                handleDelete={handleDelete}
+                            />
+                        )}
                     </div>
                 </Media>
             </Card.Body>
