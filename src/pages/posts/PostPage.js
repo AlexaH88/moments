@@ -15,6 +15,7 @@ function PostPage() {
     const { id } = useParams();
     /* put results in an array as this is the same format that will be returned if there are multiple results */
     const [post, setPost] = useState({ results: [] });
+
     const currentUser = useCurrentUser();
     const profile_image = currentUser?.profile_image;
     const [comments, setComments] = useState({ results: [] });
