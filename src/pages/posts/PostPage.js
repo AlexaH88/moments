@@ -8,6 +8,7 @@ import { axiosReq } from "../../api/axiosDefaults";
 import Post from "./Post";
 import CommentCreateForm from "../comments/CommentCreateForm";
 import { useCurrentUser } from "../../contexts/CurrentUserContext";
+import Comment from "../comments/Comment";
 
 function PostPage() {
     /* fetch post by id */
@@ -22,14 +23,15 @@ function PostPage() {
         const handleMount = async () => {
             /* make request to API */
             try {
-                /* assign data to variable and rename it post */
+                /* assign data to variable and rename it post and comments */
                 /* Promise.all gets an array of results */
-                const [{ data: post }] = await Promise.all([
+                const [{ data: post }, { data: comments }] = await Promise.all([
                     axiosReq.get(`posts/${id}`),
+                    axiosReq.get(`/comments/?post=${id}`),
                 ]);
                 /* set post results with returned post data */
                 setPost({ results: [post] });
-                console.log(post);
+                setComments(comments);
             } catch (err) {
                 console.log(err);
             }
@@ -59,6 +61,15 @@ function PostPage() {
                     ) : comments.results.length ? (
                         "Comments"
                     ) : null}
+                    {comments.results.length ? (
+                        comments.results.map((comment) => (
+                            <Comment key={comment.id} {...comment}/>
+                        ))
+                    ) : currentUser ? (
+                        <span>No comments yet, be the first to comment!</span>
+                    ) : (
+                        <span>No comments...yet</span>
+                    )}
                 </Container>
             </Col>
             <Col lg={4} className="d-none d-lg-block p-0 p-lg-2">
