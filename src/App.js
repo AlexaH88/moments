@@ -7,6 +7,7 @@ import "./api/axiosDefaults";
 import SignUpForm from "./pages/auth/SignUpForm";
 import SignInForm from "./pages/auth/SignInForm";
 import PostCreateForm from "./pages/posts/PostCreateForm";
+import PostEditForm from "./pages/posts/PostEditForm";
 import PostPage from "./pages/posts/PostPage";
 import PostsPage from "./pages/posts/PostsPage";
 import { useCurrentUser } from "./contexts/CurrentUserContext";
@@ -61,6 +62,11 @@ function App() {
                         exact
                         path="/posts/:id"
                         render={() => <PostPage />}
+                    />
+                    <Route
+                        exact
+                        path="/posts/:id/edit"
+                        render={() => <PostEditForm />}
                     />
                     {/* Page not found error message if incorrect url entered*/}
                     <Route render={() => <p>Page not found!</p>} />
