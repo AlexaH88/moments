@@ -5,7 +5,7 @@ import appStyles from "../../App.module.css";
 import Asset from "../../components/Asset";
 import { useCurrentUser } from "../../contexts/CurrentUserContext";
 
-const PopularProfiles = () => {
+const PopularProfiles = ({ mobile }) => {
     const [profileData, setProfileData] = useState({
         // we will use the pageProfile later!
         pageProfile: { results: [] },
@@ -35,14 +35,31 @@ const PopularProfiles = () => {
     }, [currentUser]);
 
     return (
-        <Container className={appStyles.Content}>
+        /* check for mobile prop being present and only display on small screens */
+        <Container
+            className={`${appStyles.Content} ${
+                mobile && "d-lg-none text-center mb-3"
+            }`}
+        >
             {popularProfiles.results.length ? (
                 <>
                     <p>Most followed profiles</p>
-                    {/* map over popular profiles and display para for each */}
-                    {popularProfiles.results.map((profile) => (
-                        <p key={profile.id}>{profile.owner}</p>
-                    ))}
+                    {/* display mobile and desktop versions */}
+                    {mobile ? (
+                        <div className="d-flex justify-content-around">
+                            {/* show only first 4 results on mobile */}
+                            {popularProfiles.results
+                                .slice(0, 4)
+                                .map((profile) => (
+                                    <p key={profile.id}>{profile.owner}</p>
+                                ))}
+                        </div>
+                    ) : (
+                        /* map over popular profiles and display para for each */
+                        popularProfiles.results.map((profile) => (
+                            <p key={profile.id}>{profile.owner}</p>
+                        ))
+                    )}
                 </>
             ) : (
                 <Asset spinner />

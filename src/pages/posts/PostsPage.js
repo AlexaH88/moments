@@ -54,7 +54,8 @@ function PostsPage({ message, filter = "" }) {
     return (
         <Row className="h-100">
             <Col className="py-2 p-0 p-lg-2" lg={8}>
-                <p>Popular profiles mobile</p>
+                {/* mobile prop included to be shown only on small screens */}
+                <PopularProfiles mobile />
                 {/* search bar */}
                 <i className={`fas fa-search ${styles.SearchIcon}`} />
                 <Form
