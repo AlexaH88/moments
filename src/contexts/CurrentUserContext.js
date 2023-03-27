@@ -3,13 +3,15 @@ import axios from "axios";
 import { axiosReq, axiosRes } from "../api/axiosDefaults";
 import { useHistory } from "react-router";
 
+/* context objects */
 export const CurrentUserContext = createContext();
 export const SetCurrentUserContext = createContext();
 
-/* create custom hooks */
+/* custom hooks */
 export const useCurrentUser = () => useContext(CurrentUserContext);
 export const useSetCurrentUser = () => useContext(SetCurrentUserContext);
 
+/* function */
 export const CurrentUserProvider = ({ children }) => {
     /* request current user data */
     const [currentUser, setCurrentUser] = useState(null);
