@@ -12,6 +12,7 @@ import Comment from "../comments/Comment";
 import Asset from "../../components/Asset";
 import InfiniteScroll from "react-infinite-scroll-component";
 import { fetchMoreData } from "../../utils/utils";
+import PopularProfiles from "../profiles/PopularProfiles";
 
 function PostPage() {
     /* fetch post by id */
@@ -48,7 +49,7 @@ function PostPage() {
     return (
         <Row className="h-100">
             <Col className="py-2 p-0 p-lg-2" lg={8}>
-                <p>Popular profiles for mobile</p>
+                <PopularProfiles mobile />
                 {/* spread post results so that its key value pairs are passed in as props */}
                 {/* include setPosts function and setPost prop which will be used for likes */}
                 {/* inclue postPage prop so that we can have the user edit and delete their own posts */}
@@ -88,7 +89,7 @@ function PostPage() {
                 </Container>
             </Col>
             <Col lg={4} className="d-none d-lg-block p-0 p-lg-2">
-                Popular profiles for desktop
+                <PopularProfiles />
             </Col>
         </Row>
     );
