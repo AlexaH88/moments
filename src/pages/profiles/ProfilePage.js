@@ -15,26 +15,34 @@ import {
     useSetProfileData,
 } from "../../contexts/ProfileDataContext";
 import { Image, Button } from "react-bootstrap";
+import InfiniteScroll from "react-infinite-scroll-component";
+import { fetchMoreData } from "../../utils/utils";
+import NoResults from "../../assets/no-results.png";
+import Post from "../posts/Post";
 
 function ProfilePage() {
     const [hasLoaded, setHasLoaded] = useState(false);
     const currentUser = useCurrentUser();
     const { id } = useParams();
     const setProfileData = useSetProfileData();
-    const { pageProfile } = useProfileData;
+    const { pageProfile } = useProfileData();
     const [profile] = pageProfile.results;
     const is_owner = currentUser?.username === profile?.owner;
+    const [profilePosts, setProfilePosts] = useState({ results: [] });
 
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const [{ data: pageProfile }] = await Promise.all([
-                    axiosReq.get(`/profiles/${id}/`),
-                ]);
+                const [{ data: pageProfile }, { data: profilePosts }] =
+                    await Promise.all([
+                        axiosReq.get(`/profiles/${id}/`),
+                        axiosReq.get(`/posts/?owner__profile=${id}`),
+                    ]);
                 setProfileData((prevState) => ({
                     ...prevState,
                     pageProfile: { results: [pageProfile] },
                 }));
+                setProfilePosts(profilePosts);
                 setHasLoaded(true);
             } catch (err) {
                 console.log(err);
@@ -92,7 +100,6 @@ function ProfilePage() {
                 {profile?.content && (
                     <Col className="p-3">{profile.content}</Col>
                 )}
-                
             </Row>
         </>
     );
@@ -100,8 +107,28 @@ function ProfilePage() {
     const mainProfilePosts = (
         <>
             <hr />
-            <p className="text-center">Profile owner's posts</p>
+            <p className="text-center">{profile?.owner}'s posts</p>
             <hr />
+            {profilePosts.results.length ? (
+                <InfiniteScroll
+                    children={profilePosts.results.map((post) => (
+                        <Post
+                            key={post.id}
+                            {...post}
+                            setPosts={setProfilePosts}
+                        />
+                    ))}
+                    dataLength={profilePosts.results.length}
+                    loader={<Asset spinner />}
+                    hasMore={!!profilePosts.next}
+                    next={() => fetchMoreData(profilePosts, setProfilePosts)}
+                />
+            ) : (
+                <Asset
+                    src={NoResults}
+                    message={`No results found, ${profile?.owner} hasn't posted yet.`}
+                />
+            )}
         </>
     );
 
