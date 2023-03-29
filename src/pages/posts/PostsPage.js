@@ -13,6 +13,7 @@ import Asset from "../../components/Asset";
 import InfiniteScroll from "react-infinite-scroll-component";
 import { fetchMoreData } from "../../utils/utils";
 import PopularProfiles from "../profiles/PopularProfiles";
+import { useCurrentUser } from "../../contexts/CurrentUserContext";
 
 /* add message and filter props, filter as an empty string initially */
 function PostsPage({ message, filter = "" }) {
@@ -20,7 +21,7 @@ function PostsPage({ message, filter = "" }) {
     const [hasLoaded, setHasLoaded] = useState(false);
     /* used to determine what url the user is on */
     const { pathname } = useLocation();
-
+    const currentUser = useCurrentUser();
     const [query, setQuery] = useState("");
 
     /* fetch data from API */
@@ -49,7 +50,7 @@ function PostsPage({ message, filter = "" }) {
         return () => {
             clearTimeout(timer);
         };
-    }, [filter, query, pathname]);
+    }, [filter, query, pathname, currentUser]);
 
     return (
         <Row className="h-100">
