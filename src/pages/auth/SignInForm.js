@@ -13,10 +13,13 @@ import appStyles from "../../App.module.css";
 import axios from "axios";
 import { useHistory } from "react-router-dom/cjs/react-router-dom.min";
 import { useSetCurrentUser } from "../../contexts/CurrentUserContext";
+import { useRedirect } from "../../hooks/useRedirect";
 
 function SignInForm() {
     /* use custom hook useSetCurrentUser */
     const setCurrentUser = useSetCurrentUser();
+    /* redirect users away from this page if they are already logged in */
+    useRedirect("loggedIn");
 
     const [signInData, setSignInData] = useState({
         username: "",
@@ -43,7 +46,7 @@ function SignInForm() {
                 signInData
             );
             setCurrentUser(data.user);
-            history.push("/");
+            history.goBack();
         } catch (err) {
             setErrors(err.response?.data);
         }
